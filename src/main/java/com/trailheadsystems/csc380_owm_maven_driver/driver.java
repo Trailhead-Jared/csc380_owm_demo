@@ -5,7 +5,12 @@
  */
 package com.trailheadsystems.csc380_owm_maven_driver;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import org.bitpipeline.lib.owm.OwmClient;
 import org.bitpipeline.lib.owm.StatusWeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
@@ -23,9 +28,10 @@ public class driver {
     public static void main(String[] args) {
         // TODO code application logic here
         OwmClient client = new OwmClient();
-        client.setAPPID("094811eebe38978dd36f1c2c835a96e4");
+        
         try
         {
+            client.setAPPID(_ReadKey());
             WeatherStatusResponse result = client.currentWeatherAtCity("Billings","Us");
             System.out.println(result.toString());
             if(result.hasWeatherStatus())
@@ -46,9 +52,23 @@ public class driver {
         {
             System.err.println(exception);
         }
-                
-        
-        
+    }
+    
+    private static String _ReadKey() throws IOException
+    {
+        String line;
+        String key = null;
+        try (
+            InputStream fis = new FileInputStream("owm.key");
+            InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
+            BufferedReader br = new BufferedReader(isr);
+        ) {
+
+            while ((line = br.readLine()) != null) {
+                key = line;
+            }
+        }
+        return key;
     }
 }
 
